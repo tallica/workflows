@@ -12,6 +12,8 @@ get an entry.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-04
+
 ### Added
 
 - `pr.yml` lints with a default Conventional Commits config when the calling
@@ -27,5 +29,6 @@ get an entry.
 - `format: false` on `check.yml` and `go.yml` skips the Prettier job, for repos
   without Prettier; a Go release still waits for every other job.
 
-[Unreleased]: https://github.com/tallica/workflows/compare/v1.0.0...master
+[Unreleased]: https://github.com/tallica/workflows/compare/v1.1.0...master
+[1.1.0]: https://github.com/tallica/workflows/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/tallica/workflows/tree/v1.0.0
