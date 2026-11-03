@@ -27,6 +27,21 @@ jobs:
       working-directory: testdata/go
       release: false
 
+  # The same with format off, as a repo without Prettier calls it.
+  go-no-format:
+    uses: ./.github/workflows/go.yml
+    permissions:
+      contents: write
+    with:
+      working-directory: testdata/go
+      format: false
+      release: false
+
+  check-no-format:
+    uses: ./.github/workflows/check.yml
+    with:
+      format: false
+
   govulncheck:
     uses: ./.github/workflows/govulncheck.yml
     with:

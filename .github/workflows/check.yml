@@ -9,6 +9,10 @@ on:
         description: Node.js for Prettier (`make fmt-check`)
         type: string
         default: "24"
+      format:
+        description: Run the Prettier job (`make fmt-check`); off for repos without Prettier
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -21,6 +25,7 @@ jobs:
       - run: make check
 
   format:
+    if: inputs.format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

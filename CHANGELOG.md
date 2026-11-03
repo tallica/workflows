@@ -16,5 +16,7 @@ get an entry.
 
 - Reusable workflows `check.yml`, `pr.yml`, `go.yml` and `govulncheck.yml`,
   called as `tallica/workflows/.github/workflows/<name>@v1`.
+- `format: false` on `check.yml` and `go.yml` skips the Prettier job, for repos
+  without Prettier; a Go release still waits for every other job.
 
 [Unreleased]: https://github.com/tallica/workflows/commits/master
