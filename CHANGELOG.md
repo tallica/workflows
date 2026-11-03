@@ -12,6 +12,11 @@ get an entry.
 
 ## [Unreleased]
 
+### Fixed
+
+- `go.yml` no longer releases when a check job was cancelled (a timeout, say)
+  while the run carried on; only skipped `format` is let through.
+
 ## [1.1.0] - 2026-11-04
 
 ### Added
