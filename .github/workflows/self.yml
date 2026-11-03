@@ -19,6 +19,17 @@ jobs:
   pr:
     uses: ./.github/workflows/pr.yml
 
+  # A directory with no commitlint config, so the default is used.
+  pr-default-config:
+    uses: ./.github/workflows/pr.yml
+    with:
+      working-directory: testdata/go
+
+  pr-no-commitlint:
+    uses: ./.github/workflows/pr.yml
+    with:
+      commitlint: false
+
   go:
     uses: ./.github/workflows/go.yml
     permissions:

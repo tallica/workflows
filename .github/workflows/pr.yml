@@ -1,10 +1,18 @@
 name: pr
 
 # Commit format and the CHANGELOG rule for a pull request. Commitlint
-# reads the calling repo's commitlint.config.mjs.
+# uses the calling repo's config, or the default below when it has none.
 on:
   workflow_call:
     inputs:
+      commitlint:
+        description: Lint the commits and PR title; off leaves only the CHANGELOG guard
+        type: boolean
+        default: true
+      working-directory:
+        description: Directory commitlint runs in and looks for its config
+        type: string
+        default: "."
       node-version:
         description: Node.js for commitlint
         type: string
@@ -23,8 +31,11 @@ permissions:
 
 jobs:
   commitlint:
-    if: github.event_name == 'pull_request'
+    if: inputs.commitlint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -36,9 +47,38 @@ jobs:
           npm install --no-save
           "@commitlint/cli@${{ inputs.commitlint-version }}"
           "@commitlint/config-conventional@${{ inputs.commitlint-version }}"
+      - name: Use the default config when the repo has none
+        run: |
+          for f in .commitlintrc .commitlintrc.json .commitlintrc.yaml .commitlintrc.yml \
+            .commitlintrc.js .commitlintrc.cjs .commitlintrc.mjs .commitlintrc.ts .commitlintrc.cts \
+            commitlint.config.js commitlint.config.cjs commitlint.config.mjs \
+            commitlint.config.ts commitlint.config.cts commitlint.config.mts; do
+            if [ -e "$f" ]; then
+              echo "Using the repo's $f"
+              exit 0
+            fi
+          done
+          if [ -f package.json ] && grep -q '"commitlint"' package.json; then
+            echo "Using the commitlint key in package.json"
+            exit 0
+          fi
+          echo "No commitlint config here; using the default"
+          cat > commitlint.config.mjs <<'EOF'
+          export default {
+            extends: ["@commitlint/config-conventional"],
+            ignores: [(message) => /^build\(deps(-dev)?\): Bump /.test(message)],
+            rules: { "body-max-line-length": [0] },
+          };
+          EOF
       - name: Lint commits
+        if: github.event_name == 'pull_request'
         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+      # Outside a pull request there is no range; lint the commit the run is for.
+      - name: Lint the last commit
+        if: github.event_name != 'pull_request'
+        run: npx commitlint --last --verbose
       - name: Lint PR title
+        if: github.event_name == 'pull_request'
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: echo "$TITLE" | npx commitlint --verbose

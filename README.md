@@ -1,22 +1,29 @@
 # workflows
 
 Reusable GitHub Actions workflows. Each calling repo keeps what defines passing
-(its Makefile, `commitlint.config.mjs`, `scripts/release-notes.sh`); these
-workflows only run them, so the CI wiring and action versions live in one place.
+(its Makefile, its commitlint config if it has one, `scripts/release-notes.sh`);
+these workflows only run them, so the CI wiring and action versions live in one
+place.
 
 ## Workflows
 
-| Workflow          | Jobs                                                                                  | Inputs (default)                                                                                                             |
-| ----------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `check.yml`       | `make check`; `make fmt-check`                                                        | `node-version` (`24`), `format` (`true`)                                                                                     |
-| `pr.yml`          | commitlint on commits and title; CHANGELOG guard                                      | `node-version` (`24`), `commitlint-version` (`19.8.1`), `changelog-label` (`user-facing`)                                    |
-| `go.yml`          | build, vet, race tests; golangci-lint; Prettier; govulncheck; GoReleaser on `v*` tags | `working-directory` (`.`), `golangci-lint-version` (`v2.14.0`), `node-version` (`24`), `format` (`true`), `release` (`true`) |
-| `govulncheck.yml` | `make audit`, for a weekly schedule in the calling repo                               | `working-directory` (`.`)                                                                                                    |
+| Workflow          | Jobs                                                                                  | Inputs (default)                                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `check.yml`       | `make check`; `make fmt-check`                                                        | `node-version` (`24`), `format` (`true`)                                                                                                    |
+| `pr.yml`          | commitlint on commits and title; CHANGELOG guard                                      | `commitlint` (`true`), `working-directory` (`.`), `node-version` (`24`), `commitlint-version` (`19.8.1`), `changelog-label` (`user-facing`) |
+| `go.yml`          | build, vet, race tests; golangci-lint; Prettier; govulncheck; GoReleaser on `v*` tags | `working-directory` (`.`), `golangci-lint-version` (`v2.14.0`), `node-version` (`24`), `format` (`true`), `release` (`true`)                |
+| `govulncheck.yml` | `make audit`, for a weekly schedule in the calling repo                               | `working-directory` (`.`)                                                                                                                   |
 
 What the calling repo needs: `make check` and `make fmt-check` for `check.yml`;
-`commitlint.config.mjs` for `pr.yml`; `go.mod`, `make fmt-check`, `make audit`
-and `scripts/release-notes.sh` for `go.yml`. A repo without Prettier passes
-`format: false` and needs no `make fmt-check`.
+`go.mod`, `make fmt-check`, `make audit` and `scripts/release-notes.sh` for
+`go.yml`. A repo without Prettier passes `format: false` and needs no
+`make fmt-check`.
+
+`pr.yml` uses the repo's commitlint config when it has one (any file name
+commitlint reads, or a `commitlint` key in `package.json`). Without one it uses
+the default: `@commitlint/config-conventional`, no limit on body line length,
+and Dependabot's `build(deps): Bump ...` subjects ignored. `commitlint: false`
+skips commitlint and keeps only the CHANGELOG guard.
 
 ## Usage
 

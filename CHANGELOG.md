@@ -12,6 +12,12 @@ get an entry.
 
 ## [Unreleased]
 
+### Added
+
+- `pr.yml` lints with a default Conventional Commits config when the calling
+  repo has no commitlint config; `commitlint: false` skips commitlint.
+- `pr.yml` takes a `working-directory` for the commitlint job.
+
 ## [1.0.0] - 2026-11-04
 
 ### Added
