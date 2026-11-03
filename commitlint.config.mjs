@@ -1,4 +1,4 @@
-// Conventional Commits; types and scopes are documented in CONTRIBUTING.md.
+// Conventional Commits.
 export default {
   extends: ["@commitlint/config-conventional"],
   // Dependabot writes "build(deps): Bump ..." with a capital B, which
@@ -6,7 +6,7 @@ export default {
   ignores: [(message) => /^build\(deps(-dev)?\): Bump /.test(message)],
   rules: {
     "body-max-line-length": [0],
-    // Once the scopes settle, enforce them (keep in step with CONTRIBUTING.md):
+    // Once the scopes settle, enforce them:
     // "scope-enum": [2, "always", ["api", "docs", "deps", "release", "ci"]],
   },
 };

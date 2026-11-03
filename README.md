@@ -54,9 +54,6 @@ run. Anything a caller would have to change for (a renamed input, a new required
 file, a removed job) is a new major version; Dependabot's `github-actions`
 updates propose the move.
 
-This repo is private; its Actions access setting lets other repositories owned
-by `tallica` call it.
-
 ## Development
 
 ```sh
