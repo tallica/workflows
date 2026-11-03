@@ -1,0 +1,62 @@
+name: pr
+
+# Commit format and the CHANGELOG rule for a pull request. Commitlint
+# reads the calling repo's commitlint.config.mjs.
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js for commitlint
+        type: string
+        default: "24"
+      commitlint-version:
+        description: Version of @commitlint/cli and @commitlint/config-conventional
+        type: string
+        default: "19.8.1"
+      changelog-label:
+        description: PRs with this label must change CHANGELOG.md
+        type: string
+        default: user-facing
+
+permissions:
+  contents: read
+
+jobs:
+  commitlint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: >-
+          npm install --no-save
+          "@commitlint/cli@${{ inputs.commitlint-version }}"
+          "@commitlint/config-conventional@${{ inputs.commitlint-version }}"
+      - name: Lint commits
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+      - name: Lint PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: echo "$TITLE" | npx commitlint --verbose
+
+  # A user-facing change without its CHANGELOG line is unfinished.
+  changelog:
+    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, inputs.changelog-label)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Require a CHANGELOG.md entry
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          LABEL: ${{ inputs.changelog-label }}
+        run: |
+          if ! git diff --name-only "$BASE"...HEAD | grep -qx CHANGELOG.md; then
+            echo "::error::PRs labelled $LABEL must add an entry to CHANGELOG.md"
+            exit 1
+          fi

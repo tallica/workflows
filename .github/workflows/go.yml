@@ -1,0 +1,113 @@
+name: go
+
+# CI for a Go repo: build, vet and race tests, golangci-lint, Prettier
+# and govulncheck, then a GoReleaser release on a `v*` tag once all of
+# them pass. The release notes come from the calling repo's
+# scripts/release-notes.sh.
+#
+# The release job needs `contents: write`, which the calling job must
+# grant; a called workflow can't raise its permissions.
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Directory holding go.mod and the Makefile
+        type: string
+        default: "."
+      golangci-lint-version:
+        description: golangci-lint to lint with
+        type: string
+        default: v2.14.0
+      node-version:
+        description: Node.js for Prettier (`make fmt-check`)
+        type: string
+        default: "24"
+      release:
+        description: Release with GoReleaser when the run is for a `v*` tag
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: ${{ inputs.working-directory }}/go.mod
+          cache: true
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test -race ./...
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: ${{ inputs.working-directory }}/go.mod
+      - uses: golangci/golangci-lint-action@v9
+        with:
+          version: ${{ inputs.golangci-lint-version }}
+          working-directory: ${{ inputs.working-directory }}
+
+  format:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: make fmt-check
+
+  # Same job as govulncheck.yml, which serves the weekly run; kept here
+  # rather than nested so this workflow has no calls of its own.
+  audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: ${{ inputs.working-directory }}/go.mod
+          cache: true
+      - run: make audit
+
+  release:
+    needs: [test, lint, format, audit]
+    if: inputs.release && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to create the release
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: ${{ inputs.working-directory }}/go.mod
+          cache: true
+      - run: scripts/release-notes.sh "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          workdir: ${{ inputs.working-directory }}
+          args: release --clean --release-notes=${{ runner.temp }}/notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

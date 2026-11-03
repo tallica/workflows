@@ -1,0 +1,33 @@
+name: self
+
+# This repo's own CI: every shared workflow, called at this commit.
+# go.yml and govulncheck.yml run against the fixture in testdata/go.
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    uses: ./.github/workflows/check.yml
+
+  pr:
+    uses: ./.github/workflows/pr.yml
+
+  go:
+    uses: ./.github/workflows/go.yml
+    permissions:
+      contents: write # go.yml's release job asks for it; release: false keeps it off
+    with:
+      working-directory: testdata/go
+      release: false
+
+  govulncheck:
+    uses: ./.github/workflows/govulncheck.yml
+    with:
+      working-directory: testdata/go

@@ -1,0 +1,30 @@
+name: check
+
+# `make check` and `make fmt-check` from the calling repo. What passing
+# means lives in that repo's Makefile; this only runs it.
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js for Prettier (`make fmt-check`)
+        type: string
+        default: "24"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: make check
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: make fmt-check

@@ -1,0 +1,13 @@
+# OS and editor droppings
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# Local tool state, not part of the repo
+.claude/
+/sessions/
+
+# Python bytecode from the tests
+__pycache__/

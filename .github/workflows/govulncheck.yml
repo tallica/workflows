@@ -1,0 +1,30 @@
+name: govulncheck
+
+# `make audit` from the calling repo. Go repos call it from a weekly
+# schedule, which only works in the repo that declares it: an advisory
+# can land with nothing in the repo changing. go.yml runs the same job
+# on every push.
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Directory holding go.mod and the Makefile
+        type: string
+        default: "."
+
+permissions:
+  contents: read
+
+jobs:
+  govulncheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: ${{ inputs.working-directory }}/go.mod
+          cache: true
+      - run: make audit
