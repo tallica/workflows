@@ -80,7 +80,7 @@ release; check the first one after changing it.
    bottom.
 3. Commit only CHANGELOG.md as `chore(release): vX.Y.Z`, then tag it
    `git tag -a vX.Y.Z -m vX.Y.Z` and move the major tag:
-   `git tag -fa v1 -m v1 vX.Y.Z`.
+   `git tag -fa v1 -m v1 'vX.Y.Z^{}'` (the commit, not the `vX.Y.Z` tag object).
 4. Push with `git push && git push origin vX.Y.Z && git push -f origin v1`.
    Pushing `v1` changes every caller's CI at once, so it waits for the
    maintainer's go-ahead.
