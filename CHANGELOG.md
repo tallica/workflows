@@ -12,6 +12,8 @@ get an entry.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-04
+
 ### Added
 
 - Reusable workflows `check.yml`, `pr.yml`, `go.yml` and `govulncheck.yml`,
@@ -19,4 +21,5 @@ get an entry.
 - `format: false` on `check.yml` and `go.yml` skips the Prettier job, for repos
   without Prettier; a Go release still waits for every other job.
 
-[Unreleased]: https://github.com/tallica/workflows/commits/master
+[Unreleased]: https://github.com/tallica/workflows/compare/v1.0.0...master
+[1.0.0]: https://github.com/tallica/workflows/tree/v1.0.0
