@@ -12,6 +12,8 @@ get an entry.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-05
+
 ### Added
 
 - `go.yml`: `notices: true` runs `make notices-check`, failing CI when the
@@ -55,7 +57,8 @@ get an entry.
 - `format: false` on `check.yml` and `go.yml` skips the Prettier job, for repos
   without Prettier; a Go release still waits for every other job.
 
-[Unreleased]: https://github.com/tallica/workflows/compare/v1.2.0...master
+[Unreleased]: https://github.com/tallica/workflows/compare/v1.3.0...master
+[1.3.0]: https://github.com/tallica/workflows/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/tallica/workflows/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/tallica/workflows/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/tallica/workflows/compare/v1.0.0...v1.1.0
