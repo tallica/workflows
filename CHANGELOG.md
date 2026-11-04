@@ -12,6 +12,8 @@ get an entry.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-04
+
 ### Changed
 
 - `go.yml`'s format job runs with `format: false` too and passes without running
@@ -48,7 +50,8 @@ get an entry.
 - `format: false` on `check.yml` and `go.yml` skips the Prettier job, for repos
   without Prettier; a Go release still waits for every other job.
 
-[Unreleased]: https://github.com/tallica/workflows/compare/v1.1.1...master
+[Unreleased]: https://github.com/tallica/workflows/compare/v1.2.0...master
+[1.2.0]: https://github.com/tallica/workflows/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/tallica/workflows/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/tallica/workflows/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/tallica/workflows/tree/v1.0.0
