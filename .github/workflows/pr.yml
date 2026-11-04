@@ -83,15 +83,24 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
         run: echo "$TITLE" | npx commitlint --verbose
 
-  # A user-facing change without its CHANGELOG line is unfinished.
+  # A user-facing change without its CHANGELOG line is unfinished. The job
+  # always runs and decides in its steps, so it shows as passed, not skipped.
   changelog:
-    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, inputs.changelog-label)
     runs-on: ubuntu-latest
+    env:
+      LABELLED: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, inputs.changelog-label) }}
     steps:
+      - name: Nothing to check
+        if: env.LABELLED != 'true'
+        env:
+          LABEL: ${{ inputs.changelog-label }}
+        run: echo "Not a pull request labelled $LABEL; nothing to check"
       - uses: actions/checkout@v7
+        if: env.LABELLED == 'true'
         with:
           fetch-depth: 0
       - name: Require a CHANGELOG.md entry
+        if: env.LABELLED == 'true'
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
           LABEL: ${{ inputs.changelog-label }}

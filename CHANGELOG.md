@@ -12,6 +12,11 @@ get an entry.
 
 ## [Unreleased]
 
+### Changed
+
+- `pr.yml`'s CHANGELOG guard runs on every pull request and passes when the PR
+  isn't labelled, instead of showing as skipped.
+
 ## [1.1.1] - 2026-11-04
 
 ### Fixed
