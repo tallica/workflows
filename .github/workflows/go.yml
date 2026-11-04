@@ -66,9 +66,6 @@ jobs:
   # would skip the release.
   format:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ inputs.working-directory }}
     steps:
       - name: Prettier is off
         if: ${{ !inputs.format }}
@@ -79,8 +76,11 @@ jobs:
         if: inputs.format
         with:
           node-version: ${{ inputs.node-version }}
+      # Not a job default: with format off nothing is checked out, and the
+      # echo step would start in a directory that doesn't exist.
       - run: make fmt-check
         if: inputs.format
+        working-directory: ${{ inputs.working-directory }}
 
   # Same job as govulncheck.yml, which serves the weekly run; kept here
   # rather than nested so this workflow has no calls of its own.
