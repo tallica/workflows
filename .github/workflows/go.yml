@@ -62,18 +62,25 @@ jobs:
           version: ${{ inputs.golangci-lint-version }}
           working-directory: ${{ inputs.working-directory }}
 
+  # Runs with `format: false` too, so that it never skips: a skipped need
+  # would skip the release.
   format:
-    if: inputs.format
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
     steps:
+      - name: Prettier is off
+        if: ${{ !inputs.format }}
+        run: echo "format is false; make fmt-check not run"
       - uses: actions/checkout@v7
+        if: inputs.format
       - uses: actions/setup-node@v7
+        if: inputs.format
         with:
           node-version: ${{ inputs.node-version }}
       - run: make fmt-check
+        if: inputs.format
 
   # Same job as govulncheck.yml, which serves the weekly run; kept here
   # rather than nested so this workflow has no calls of its own.
@@ -91,13 +98,9 @@ jobs:
       - run: make audit
 
   release:
+    # Runs only when every need succeeded, GitHub's default for `needs`.
     needs: [test, lint, format, audit]
-    # A skipped format job would skip this one too, so allow skipped, but only
-    # release when every other job succeeded: not failed, not cancelled.
-    if: >-
-      !cancelled() && !contains(needs.*.result, 'failure')
-      && !contains(needs.*.result, 'cancelled') && inputs.release
-      && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: inputs.release && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: write # to create the release

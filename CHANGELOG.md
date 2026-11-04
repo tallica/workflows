@@ -14,8 +14,15 @@ get an entry.
 
 ### Changed
 
+- `go.yml`'s format job runs with `format: false` too and passes without running
+  Prettier, instead of showing as skipped.
 - `pr.yml`'s CHANGELOG guard runs on every pull request and passes when the PR
   isn't labelled, instead of showing as skipped.
+
+### Fixed
+
+- `go.yml` releases only when every check job succeeded; a skipped check no
+  longer lets a release through.
 
 ## [1.1.1] - 2026-11-04
 
