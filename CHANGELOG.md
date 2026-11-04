@@ -12,6 +12,11 @@ get an entry.
 
 ## [Unreleased]
 
+### Added
+
+- `go.yml`: `notices: true` runs `make notices-check`, failing CI when the
+  repo's THIRD_PARTY_NOTICES.md no longer matches its linked modules.
+
 ## [1.2.0] - 2026-11-04
 
 ### Changed

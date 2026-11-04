@@ -7,17 +7,17 @@ place.
 
 ## Workflows
 
-| Workflow          | Jobs                                                                                  | Inputs (default)                                                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `check.yml`       | `make check`; `make fmt-check`                                                        | `node-version` (`24`), `format` (`true`)                                                                                                    |
-| `pr.yml`          | commitlint on commits and title; CHANGELOG guard                                      | `commitlint` (`true`), `working-directory` (`.`), `node-version` (`24`), `commitlint-version` (`19.8.1`), `changelog-label` (`user-facing`) |
-| `go.yml`          | build, vet, race tests; golangci-lint; Prettier; govulncheck; GoReleaser on `v*` tags | `working-directory` (`.`), `golangci-lint-version` (`v2.14.0`), `node-version` (`24`), `format` (`true`), `release` (`true`)                |
-| `govulncheck.yml` | `make audit`, for a weekly schedule in the calling repo                               | `working-directory` (`.`)                                                                                                                   |
+| Workflow          | Jobs                                                                                           | Inputs (default)                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `check.yml`       | `make check`; `make fmt-check`                                                                 | `node-version` (`24`), `format` (`true`)                                                                                                          |
+| `pr.yml`          | commitlint on commits and title; CHANGELOG guard                                               | `commitlint` (`true`), `working-directory` (`.`), `node-version` (`24`), `commitlint-version` (`19.8.1`), `changelog-label` (`user-facing`)       |
+| `go.yml`          | build, vet, race tests; golangci-lint; Prettier; govulncheck; notices; GoReleaser on `v*` tags | `working-directory` (`.`), `golangci-lint-version` (`v2.14.0`), `node-version` (`24`), `format` (`true`), `notices` (`false`), `release` (`true`) |
+| `govulncheck.yml` | `make audit`, for a weekly schedule in the calling repo                                        | `working-directory` (`.`)                                                                                                                         |
 
 What the calling repo needs: `make check` and `make fmt-check` for `check.yml`;
 `go.mod`, `make fmt-check`, `make audit` and `scripts/release-notes.sh` for
 `go.yml`. A repo without Prettier passes `format: false` and needs no
-`make fmt-check`.
+`make fmt-check`; `notices: true` also needs `make notices-check`.
 
 `pr.yml` uses the repo's commitlint config when it has one (any file name
 commitlint reads, or a `commitlint` key in `package.json`). Without one it uses

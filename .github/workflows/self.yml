@@ -36,9 +36,10 @@ jobs:
       contents: write # go.yml's release job asks for it; release: false keeps it off
     with:
       working-directory: testdata/go
+      notices: true
       release: false
 
-  # The same with format off, as a repo without Prettier calls it.
+  # The same with format and notices off, as a repo without Prettier calls it.
   go-no-format:
     uses: ./.github/workflows/go.yml
     permissions:
